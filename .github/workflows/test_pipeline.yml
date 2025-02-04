@@ -32,9 +32,12 @@ jobs:
         with:
           python-version: '3.9'
 
+      - name : List
+        run: ls -R
+
       - name: Install dependencies
         run: |
           pip install pytest
       - name: Run E2E  Automation Tests
         run: |
-          pytest tests/tests_pipeline.py
+          pytest tests_pipeline.py
