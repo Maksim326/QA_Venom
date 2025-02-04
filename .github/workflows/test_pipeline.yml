@@ -40,4 +40,4 @@ jobs:
           pip install pytest
       - name: Run E2E  Automation Tests
         run: |
-          pytest tests_pipeline.py
+          pytest tests/tests/test_pipeline.py
