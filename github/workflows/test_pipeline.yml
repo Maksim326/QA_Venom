@@ -1,0 +1,40 @@
+name: E2E Automation tests
+
+on:
+  workflow_dispatch:
+    schedule:
+      - cron: '0 2 * * *' #run daily on 2am utc
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout from QA Azure repo
+        uses: actions/checkout@v3
+        with:
+          repository: Maksim326/QA_Azure
+          path: azure_functions
+
+      - name: Checkout from QA Fabric repo
+        uses: actions/checkout@v3
+        with:
+          repository: Maksim326/QA_Fabric
+          path: fabric_pipeline
+
+      - name: Checkout from QA Venom repo
+        uses: actions/checkout@v3
+        with:
+          repository: Maksim326/QA_Venom2
+          path: tests
+
+      - name: Setup Python
+        uses : actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: |
+          pip install pytest
+      - name: Run E2E  Automation Tests
+        run: |
+          pytest tests/tests_pipeline.py
