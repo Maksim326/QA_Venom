@@ -24,7 +24,7 @@ jobs:
       - name: Checkout from QA Venom repo
         uses: actions/checkout@v3
         with:
-          repository: Maksim326/QA_Venom2
+          repository: Maksim326/QA_Venom
           path: tests
 
       - name: Setup Python
