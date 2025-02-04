@@ -2,8 +2,8 @@ name: E2E Automation tests
 
 on:
   workflow_dispatch:
-    schedule:
-      - cron: '0 2 * * *' #run daily on 2am utc
+  schedule:
+    - cron: '0 2 * * *' #run daily on 2am utc
 
 jobs:
   run-tests:
