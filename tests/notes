@@ -1,73 +1,61 @@
-Introduction. 
+### Introduction
+This proposal outlines the design and implementation of a QA Automation Test Framework for Data Flow testing. The framework ensures that each step in the pipeline is verified during execution while allowing seamless execution in production without tests.
 
-This Proposal outlines the design and implementation of an QA Automation Test Framework for Data Flow testing. The framework will ensure that each step in the pipeline is verified  during execution while allowing seamless execution in production without tests  
+### Objective
+- Automate tests for key pipeline steps (file received, file upload, raw table validation, transformation steps).
+- Centralize all test logic in a dedicated repository.
+- Ensure that tests run only during CI/CD execution while being skipped in production.
+- Use GitHub Actions for continuous integration and deployment.
 
-  
+### Overview
+The framework consists of three GitHub repositories:
+1. **DataPlatform-OrchestrationFunction** – For Azure functions.
+2. **DataPlatform-Python** – Contains all pipeline steps and pipeline validations.
+3. **QA Automation Test Framework** (not created yet).
 
-Objective 
+### Implementation Steps
+#### Test Files
+- Test files will be stored in dedicated blob storage and used for test execution.
+- Test files will be uploaded to the inbound folder (Azure function will provide information about test file location via `construct_event_data`).
 
-Automation tests for key pipeline steps(file received, file upload, raw table validation, transformation steps) 
+#### GitHub Actions Integration
+- GitHub Actions will automate the testing process.
 
-Centralize all test logic in a dedicated repository 
+#### Deploy Pipeline Repositories
+- If the test repository is available, it loads and executes tests.
+- If running in production, tests are skipped.
 
-Ensure that tests run only during CI/CD execution while being skipped in Production 
+#### Skipping Tests in Production
+- If running in a production environment, tests will not be applied.
+- The pipeline will execute without interruption from tests.
 
-Use GitHub Actions for continuous integration and deployment 
+### Framework Benefits
+- **Automation** – GitHub Actions automates test execution and deployment.
+- **Flexibility** – Tests are executed dynamically during CI/CD but skipped in production.
+- **Scalability** – New tests can be added without modifying production code.
+- **Modularity** – All test logic resides in the QA Automation Test Framework, reducing duplication.
 
-  
+### Including Notes
+#### Data Pipeline & Event Hub Testing Framework
+##### Launch Strategy
+- Trigger through Fabric schedule.
+- Place the files in the test path.
+- File gets dropped at the test path.
+- File dropped event is created.
+- Correlation ID:
+  - Get correlation ID based on file path in the Event Hub.
+  - File path triggers Azure function initiation.
+  - Azure file movement event occurs.
+  - **Config.json:**
+    - Get event for the correlation ID.
+    - Run tests for the Azure functions.
 
-Overview  
+##### Raw Table Load
+- Correlation ID:
+  - Publish event with raw table load.
+  - File path triggers event retrieval for the correlation ID.
+  - Run tests for the raw table load.
 
-The framework consists of 3 GitHub repositories: 
+### Skipping Azure/Fabric Repositories
+- Tests will be executed from the QA Automation Test Framework repository and will look for the corresponding ID from Azure functions.
 
-DataPlatform-OrchestrationFunction for Azure functions 
-
-DataPlatform-Python - all pipeline steps and pipeline validations 
-
-QA  Automation Test Framework( not created yet) 
-
-  
-
-Implementation Steps: 
-
-Test Decorators  
-
-All test decorators are implemented in the QA  Automation Test Framework repository. They will be referenced in the Pipeline Repositories  (Overview 1 and 2)  but will be skipped in production 
-
-Test files: 
-
-Test files will be stored in dedicated blob storage and will be used for test execution 
-
-Test files will be uploaded to inbound folder (azure function will provide us information about test file location construct_event_data) 
-
-Referencing Decorators in Pipeline Repositories 
-
-Decorator(s) will be added to all functions(steps) in Pipeline Repositories. If decorators are not found (in case of Prod run), a fallback mechanism will disable them 
-
-GitHub Actions Integration. 
-
-GitHub Actions will automate the testing Process 
-
-Deploy Pipeline Repositories  
-
-If Test repository is available, it loads decorators and executes tests 
-
-If running in Production, tests are skipped 
-
-Skipping tests in Production 
-
-If running in a Production environment, decorators will not be applied 
-
-The Pipeline will execute without interruption from tests 
-
-  
-
-Framework Benefits: 
-
-Automation- GitHub Actions automates test execution and deployment 
-
-Flexibility - Tests are executed dynamically during CI/CD but skipped in Production 
-
-Scalability - New tests can be added without modifying Production Code 
-
-Modularity- All test Logic resides in QA  Automation Test Framework, reducing duplication 
