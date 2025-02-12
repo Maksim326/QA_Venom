@@ -1,61 +1,87 @@
-### Introduction
-This proposal outlines the design and implementation of a QA Automation Test Framework for Data Flow testing. The framework ensures that each step in the pipeline is verified during execution while allowing seamless execution in production without tests.
+Introduction.
+This proposal outlines the design and implementation of a QA Automation Test Framework for Data Flow testing. The framework ensures that each step in the pipeline is verified during execution. 
+Objective
+1.	Automation tests for key pipeline steps(file received, file upload, raw table validation, transformation steps)
+2.	Centralize all test logic in a dedicated repository
+3.	Ensure that tests run only during CI/CD
+4.	Use GitHub Actions for continuous integration and deployment
+ 
+Overview 
+The framework consists of 1 GitHub repositories:
+-	QA  Automation Test Framework( not created yet)
+ 
+Implementation Steps:
+-	Test files:
+o	Test files will be stored in dedicated blob storage and will be used for test execution
+o	Test files will be uploaded to inbound folder (azure function will provide us information about test file location construct_event_data)
+-	GitHub Actions Integration.
+GitHub Action will automate the testing Process
+-  GitHub Actions will automate the testing process. 
+-  GitHub Action will start automation tests with placing file to the inbound folder
 
-### Objective
-- Automate tests for key pipeline steps (file received, file upload, raw table validation, transformation steps).
-- Centralize all test logic in a dedicated repository.
-- Ensure that tests run only during CI/CD execution while being skipped in production.
-- Use GitHub Actions for continuous integration and deployment.
 
-### Overview
-The framework consists of three GitHub repositories:
-1. **DataPlatform-OrchestrationFunction** – For Azure functions.
-2. **DataPlatform-Python** – Contains all pipeline steps and pipeline validations.
-3. **QA Automation Test Framework** (not created yet).
 
-### Implementation Steps
-#### Test Files
-- Test files will be stored in dedicated blob storage and used for test execution.
-- Test files will be uploaded to the inbound folder (Azure function will provide information about test file location via `construct_event_data`).
+DataPipeline  and QA tests execution 
+Data Pipeline	EVENT HUB	 	 	Testing framework
+ 	 	 	launch strategy	Trigger through fabric schedule/or GHA
+ 	 	 	 	Access and place the files to Inbound folder 
+file gets dropped 	 	 	 	 
+file dropped event has been created	 	 	 	 
+correlation ID	 	get correlation ID based on file path in the event hub	 	 
+file path	 	 	 	 get file path and correlation ID
+Azure function initiated with correlation ID	 	 	 	 
+file path	azure file movement event	 	 	 
+config.json	 	get event for the correlation ID	 	Run the tests for the azure functions
+ 	 	 	 	 
+Raw table load	 	 	 	 
+correlation ID	publish event with raw table load	 	 	 
+file path	 	get event for the correlation ID	 	 
+ 	 	 	 	Run the tests for the raw table load
+Transformation steps 	 	 	 	TBD
 
-#### GitHub Actions Integration
-- GitHub Actions will automate the testing process.
 
-#### Deploy Pipeline Repositories
-- If the test repository is available, it loads and executes tests.
-- If running in production, tests are skipped.
 
-#### Skipping Tests in Production
-- If running in a production environment, tests will not be applied.
-- The pipeline will execute without interruption from tests.
 
-### Framework Benefits
-- **Automation** – GitHub Actions automates test execution and deployment.
-- **Flexibility** – Tests are executed dynamically during CI/CD but skipped in production.
-- **Scalability** – New tests can be added without modifying production code.
-- **Modularity** – All test logic resides in the QA Automation Test Framework, reducing duplication.
 
-### Including Notes
-#### Data Pipeline & Event Hub Testing Framework
-##### Launch Strategy
-- Trigger through Fabric schedule.
-- Place the files in the test path.
-- File gets dropped at the test path.
-- File dropped event is created.
-- Correlation ID:
-  - Get correlation ID based on file path in the Event Hub.
-  - File path triggers Azure function initiation.
-  - Azure file movement event occurs.
-  - **Config.json:**
-    - Get event for the correlation ID.
-    - Run tests for the Azure functions.
+ Tests for Data Pipeline steps : 
+1. New Client File received (inbound folder) 
+Testing notes: 
+Different files to test different cases  
+1 - file with correct structure and expected data 
+2 - file with incorrect data or structure;  
+3 - an empty file 
+ 
+2. Tests while file is uploading to Azure blob storage: 
+1. Test to verify file moved to 'current' directory with timestamp  
+2. Test to verify file moved to   'archive' directory with timestamp  
+3. Test to verify file deleted from blob Storage  
+4. Test to verify if File Moving step is completed successfully 
+ 
+3. Raw table tests: 
+1. Test to verify if raw table creation step successfully completed 
+2. Test raw table created and available,  
+3. Test Raw Table is not empty,  
+4. Test to verify expected column names from config 
+5. Test to compare Source file with Raw table data 
+ 
+4. Transformation step tests: 
+TBD 
 
-##### Raw Table Load
-- Correlation ID:
-  - Publish event with raw table load.
-  - File path triggers event retrieval for the correlation ID.
-  - Run tests for the raw table load.
 
-### Skipping Azure/Fabric Repositories
-- Tests will be executed from the QA Automation Test Framework repository and will look for the corresponding ID from Azure functions.
+
+Framework Benefits:
+1.	Automation- GitHub Actions automates test execution and deployment
+2.	Scalability - New tests can be added without modifying Production Code
+3.	Modularity- All test Logic resides in QA  Automation Test Framework, reducing duplication
+ 
+Data Flow(simplified)
+ 
+ 
+Data Pipeline Execution with Tests
+
+ 
+
+ 
+ 
+ 
 
