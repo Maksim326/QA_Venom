@@ -31,24 +31,6 @@ o	Use Correlation ID and file path to confirm  Test Data Flow and select correct
 
 
 
-DataPipeline  and QA tests execution 
-Data Pipeline	EVENT HUB	 	 	Testing framework
- 	 	 	launch strategy	Trigger through fabric schedule/or GHA
- 	 	 	 	Access and place the files to Inbound folder 
-file gets dropped 	 	 	 	 
-file dropped event has been created	 	 get correlation ID based on file path in the event hub	 	 
-correlation ID	 		 	 
-file path	 	 	 	 get file path and correlation ID
-Azure function initiated with correlation ID	 	 	 	 
-file path	azure file movement event	 	 	 
-config.json	 	get event for the correlation ID	 	Run the tests for the azure functions
- 	 	 	 	 
-Raw table load	 	 	 	 
-correlation ID	publish event with raw table load	 	 	 
-file path	 	get event for the correlation ID	 	 
- 	 	 	 	Run the tests for the raw table load
-Transformation steps 	 	 	 	Run Transformation tests 
-
 Framework Benefits:
 1.	Automation- GitHub Actions automates test execution and deployment
 2.	Scalability - New tests can be added without modifying Production Code
