@@ -15,11 +15,14 @@ TC-13	Transformation Validation	Data Loss Prevention Test	No data is lost during
 TC-14	Final Table Validation	Final Table Creation Test	Final table is created successfully.
 TC-15	Final Table Validation	Final Table Schema Validation Test	Final table schema matches expectations.
 TC-16	Final Table Validation	Final Data Integrity Test	Transformed data is correctly stored in the final table.
-TC-17	File Processing & Movement	File Moved to Processing Directory Test	File moves from Inbound to processing directory.
-TC-18	File Processing & Movement	File Moved to Archive Directory Test	Processed files are correctly archived.
+TC-17	File Processing & Movement	File Moved to Processing Directory Test	File moves from Inbound to the processing directory.
+TC-18	File Processing & Movement	File Moved to Archive Directory Test	Processed files are correctly archived in Blob Storage.
 TC-19	File Processing & Movement	File Deletion from Blob Storage Test	File is deleted from Blob Storage after processing.
 TC-20	Error Handling & Logging	Error Logging for Invalid File Test	Error logs are generated for invalid files.
 TC-21	Error Handling & Logging	Processing Timeout Test	System logs errors when processing timeouts occur.
 TC-22	Error Handling & Logging	Correlation ID Validation Test	Each file receives a unique correlation ID for tracking.
 TC-23	CI/CD Integration & Automation	Automated Test Execution Test	GitHub Actions trigger tests in CI/CD pipeline.
 TC-24	CI/CD Integration & Automation	Test Report Generation Test	Test reports are generated and logged.
+TC-25	File Processing & Movement	Verify File Movement to Current Directory in Blob Storage	Ensure the uploaded file moves from Inbound to the processing directory in Blob Storage.
+TC-26	File Processing & Movement	Verify File Movement to Archive Directory in Blob Storage	Ensure the processed file moves from the processing directory to the Archive directory in Blob Storage.
+TC-27	File Processing & Movement	Verify File Deletion from Blob Storage After Processing	Ensure that the file is deleted from the processing directory after archiving.
