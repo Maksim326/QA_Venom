@@ -1,77 +1,29 @@
-Proposal: QA Automation Test Framework for Data Flow Testing
-Introduction
-This proposal outlines the design and implementation of a QA Automation Test Framework for Data Flow Testing in an Azure-based pipeline. The framework will ensure that every step in the pipeline is validated, automated, and integrated with CI/CD to ensure data integrity and system reliability. It is designed to be modular, scalable, and maintainable while keeping all test logic centralized in a dedicated QA Automation Test Framework repository.
-
-Objective
-The primary objectives of the QA Automation Test Framework include:
-
-Automate Testing for Key Pipeline Steps, including:
-File ingestion and upload validation
-Raw table creation verification
-Transformation step validation
-Final table validation
-Centralized Test Logic in a dedicated QA Automation Test Framework repository.
-Ensure that tests run only during CI/CD execution, not in production.
-Leverage GitHub Actions for automated testing, integration, and deployment.
-Data Pipeline Execution with Tests
-The following steps outline how the testing framework integrates with the data pipeline:
-
-Test files are pushed to the raw path for execution.
-Azure function receives the file and moves it to blob storage.
-Azure Event Hub generates a correlation ID, which is used to track the data flow.
-Automated tests validate each stage of data processing:
-Azure function tests ensure file reception and movement to blob storage.
-Raw table tests verify data ingestion.
-Transformation tests validate business logic applied to raw data.
-Final table tests ensure correct data storage and accessibility.
-Test results are published, and reports are generated.
-Overview of the Framework
-The framework consists of the following components:
-
-1. QA Automation Test Framework
-A dedicated repository for all test logic.
-Contains test cases for each stage of the pipeline.
-Uses pytest for execution and assertion validation.
-2. Azure Testing Orchestration Functions
-Orchestrates the execution of tests for different pipeline stages.
-Ensures the correct test cases are triggered at each stage.
-Reads event data and correlation IDs to track and validate the data flow.
-Tools & Technologies
-Python for writing test scripts.
-Pytest for executing test cases and validating assertions.
-Azure Functions to trigger and execute tests.
-Event Hub for tracking correlation IDs across the pipeline.
-GitHub Actions for test execution as part of CI/CD.
-Scheduler for triggering tests during CI/CD pipeline execution.
-Implementation Steps
-Test File Management
-
-Test files will be stored in the test repository or a dedicated blob storage.
-These files will be uploaded to an inbound folder, and the Azure function will generate a correlation ID for tracking.
-Test Execution & Validation
-
-Using the correlation ID and file path, the framework will validate data ingestion.
-Tests will verify raw table creation, transformation steps, and final table correctness.
-CI/CD Integration
-
-Tests will be executed only during CI/CD runs using GitHub Actions.
-If a test fails, the pipeline execution will halt to prevent invalid data propagation.
-Benefits of the Framework
-Automated Execution
-
-GitHub Actions automates test execution and deployment, eliminating manual intervention.
-Scalability
-
-New test cases can be added independently without modifying production code.
-Modularity
-
-All test logic is centralized in the QA Automation Test Framework repository, avoiding duplication across repositories.
-Simplified Data Flow
-Push Sample Files → 2. Azure Function receives & moves file to Blob Storage → 3. Raw Table Created → 4. Transformations Applied → 5. Final Table Created
-Automated tests validate each step and publish test reports.
-Next Steps
-Set up the QA Automation Test Framework repository.
-Develop Pytest-based test scripts for each pipeline stage.
-Integrate test execution with GitHub Actions.
-Deploy Azure testing orchestration functions.
-Monitor and refine automation as required.
+1. File Upload Validation Tests
+✅ Verify that a file can be successfully uploaded to the inbound folder.
+✅ Verify that files with valid extensions (e.g., .csv, .parquet, .json) are accepted.
+✅ Verify that files with invalid extensions (e.g., .exe, .txt, .zip) are rejected.
+✅ Verify that an empty file is rejected and does not trigger further processing.
+✅ Verify that a large file within the allowed size limit is successfully uploaded.
+✅ Verify that a file exceeding the allowed size limit is rejected.
+2. Azure Function Execution Tests
+✅ Verify that the Azure Function is triggered upon file upload.
+✅ Verify that the function logs file metadata (e.g., name, size, timestamp).
+✅ Verify that the function correctly moves the file from the inbound folder to the appropriate Azure Storage Blob location.
+✅ Verify that the function assigns a correlation ID to the uploaded file.
+3. Azure Storage Blob Validation Tests
+✅ Verify that a storage blob is created for a valid uploaded file.
+✅ Verify that the blob path follows the expected directory structure.
+✅ Verify that the blob contains the same data as the original uploaded file.
+✅ Verify that metadata such as file name, size, and timestamp is correctly stored.
+✅ Verify that an invalid or empty file does not create a blob in Azure Storage.
+4. Raw Table Creation Tests
+✅ Verify that a valid uploaded file triggers the creation of a raw table.
+✅ Verify that the raw table contains the correct schema and structure.
+✅ Verify that all records from the uploaded file are correctly ingested into the raw table.
+✅ Verify that duplicate file uploads do not create duplicate records in the raw table.
+✅ Verify that files with incorrect schemas or missing mandatory columns are rejected.
+5. Error Handling & Logging Tests
+✅ Verify that an error log is generated if the file fails validation (e.g., invalid format, empty file).
+✅ Verify that processing errors (e.g., Azure Function failure, storage failure) are logged correctly.
+✅ Verify that alerts/notifications are triggered for failed uploads.
+✅ Verify that a retry mechanism is available for transient failures.
