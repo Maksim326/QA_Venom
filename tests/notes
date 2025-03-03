@@ -1,81 +1,74 @@
-File Upload Validation Tests
+Proposal: QA Automation Test Framework for Data Flow Testing
+Introduction.
+This proposal outlines the design and implementation of a QA Automation Test Framework for Data Flow Testing in an Azure-based pipeline. The framework will ensure that every step in the pipeline is validated, automated, and integrated with CI/CD 
+ 
 
-Valid File Upload Test
+Objective
+The primary objectives of the QA Automation Test Framework include:
+1.	Automate Testing for Key Pipeline Steps, including:
+•	File ingestion and upload validation
+•	Raw table creation verification
+•	Transformation step(s) validation
+•	Final table validation
+2.	Centralized Test Logic in a dedicated QA Automation Test Framework repository.
+3.	Ensure that tests run only during CI/CD execution, not in production.
+4.	Leverage GitHub Actions for automated testing, integration, and deployment. 
+Data Pipeline Execution with Tests
+The following steps outline how the testing framework integrates with the data pipeline:
+1.	Test files are pushed to the Inbound path for execution.
+2.	Azure function receives the file (eTag is created after uploading file), creates blob storage and moves it to blob storage.
+3.	Azure Event Hub generates a correlation ID (select using eTag), which is used to track the data flow.
+4.	Automated tests validate each step of data processing:
+•	Azure function tests ensure file reception and movement to blob storage.
+•	Raw table tests verify data ingestion.
+•	Transformation tests validate business logic applied to raw data.
+•	Final table tests ensure correct data storage and accessibility.
+5.	Test results are published, and reports are generated.
+Overview of the Framework
+The framework consists of the following components:
+1. QA Automation Test Framework
+•	A dedicated repository for all test logic.
+•	Contains test cases for each stage of the pipeline.
+•	Uses pytest for execution and assertion validation.
+2. Azure Testing Orchestration Functions
+•	Orchestrates the execution of tests for different pipeline steps.
+•	Ensures the correct test cases are triggered at each step.
+•	Reads event data and correlation IDs to track and validate the data flow for uploaded file(s).
 
-Upload a valid file (correct extension and non-empty).
+Tools
+•	Python for writing test scripts.
+•	Pytest for executing test cases and validating assertions.
+•	Azure Functions to trigger and execute tests.
+•	Event Hub for tracking correlation IDs across the pipeline.
+•	GitHub Actions for test execution as part of CI/CD.
+•	Scheduler for triggering tests during CI/CD pipeline execution. 
 
-Verify that the file appears in the Inbound folder.
 
-Invalid File Extension Test
+Implementation Steps
+1.	Test File Management
+•	Test files will be stored in the test repository or a dedicated blob storage.
+•	These files will be uploaded to an inbound folder, and the Azure function will generate a correlation ID for tracking.
+2.	Test Execution & Validation
+•	Using the correlation ID and file path, the framework will validate data ingestion.
+•	Tests will verify raw table creation, transformation steps, and final table correctness.
+3.	CI/CD Integration
+•	Tests will be executed only during CI/CD runs using GitHub Actions.
+•	If a test fails, the pipeline execution will continue.
 
-Upload a file with an unsupported extension.
+Framework Benefits:
+1.	Automated Execution
+•	GitHub Actions automates test execution and deployment, eliminating manual intervention.
+2.	Scalability
+•	New test cases can be added independently without modifying production code.
+3.	Modularity
+•	All test logic is centralized in the QA Automation Test Framework repository, avoiding duplication across repositories. 
 
-Verify that the file is rejected and does not trigger further processing.
+Data Flow(simplified)
+ 
+ 
 
-Empty File Upload Test
 
-Upload an empty file (0 bytes).
+ 
+ 
+ 
 
-Ensure the pipeline does not process the file and logs an error.
-
-Duplicate File Upload Test
-
-Upload the same file twice.
-
-Verify that the system correctly handles duplicate file uploads (either overwrites, rejects, or versions the file).
-
-Azure Storage Blob Validation Tests
-
-Blob Storage Creation Test
-
-After a valid file is uploaded, verify that a corresponding Azure Storage Blob is created.
-
-Blob Metadata Validation Test
-
-Ensure the created blob contains correct metadata (e.g., filename, timestamp, eTag).
-
-Blob Storage Accessibility Test
-
-Verify that the uploaded file in Blob Storage is accessible and not corrupted.
-
-Raw Table Creation Validation Tests
-
-Raw Table Entry Creation Test
-
-After a valid file upload, verify that an entry for the file is created in the Raw Table.
-
-Raw Table Schema Validation Test
-
-Ensure that the raw table has the correct schema (columns, data types, etc.).
-
-Raw Table Data Integrity Test
-
-Verify that the data ingested into the raw table matches the uploaded file.
-
-File Movement and Cleanup Tests
-
-File Moved to Current Directory Test
-
-Verify that after processing, the file is moved from Inbound to the current directory.
-
-File Moved to Archive Directory Test
-
-Ensure that processed files are archived correctly.
-
-File Deletion from Blob Storage Test
-
-Verify that the original file is deleted from Blob Storage after processing.
-
-Error Handling & Logging Tests
-
-Error Logging for Invalid File Test
-
-Upload an invalid file and check if appropriate error logs are generated.
-
-Processing Timeout Test
-
-Simulate network delays or processing timeouts and ensure the system logs errors appropriately.
-
-Correlation ID Validation Test
-
-Ensure that every valid file upload generates a unique correlation ID for tracking the data flow.
