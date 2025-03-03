@@ -1,60 +1,25 @@
-File Upload Validation Tests
-
-Valid File Upload Test
-Upload a valid file (correct extension and non-empty).
-Verify that the file appears in the Inbound folder.
-
-Invalid File Extension Test
-Upload a file with an unsupported extension.
-Verify that the file is rejected and does not trigger further processing.
-
-Empty File Upload Test
-Upload an empty file (0 bytes).
-Ensure the pipeline does not process the file and logs an error.
-
-Duplicate File Upload Test
-Upload the same file twice.
-Verify that the system correctly handles duplicate file uploads (either overwrites, rejects, or versions the file(s)).
-
-
-Azure Storage Blob Validation Tests
-
-Blob Storage Creation Test
-After a valid file is uploaded, verify that a corresponding Azure Storage Blob is created.
-
-Blob Metadata Validation Test
-Ensure the created blob contains correct metadata (e.g., filename, timestamp, eTag).
-
-Blob Storage Accessibility Test
-Verify that the uploaded file in Blob Storage is accessible and not corrupted.
-
-
-Raw Table Creation Validation Tests
-After a valid file upload, verify that an entry for the file is created in the Raw Table.
-
-Raw Table Schema Validation Test
-Ensure that the raw table has the correct schema (columns, data types, etc.).
-
-Raw Table Data Integrity Test
-Verify that the data ingested into the raw table matches the uploaded file.
-
-
-
-
-File Moved to Current Directory Test
-Verify that after processing, the file is moved from Inbound to the current directory.
-
-File Moved to Archive Directory Test
-Ensure that processed files are archived correctly.
-
-File Deletion from Blob Storage Test
-Verify that the original file is deleted from Blob Storage after processing.
-
-Error Handling & Logging Tests
-Error Logging for Invalid File Test
-Upload an invalid file and check if appropriate error logs are generated.
-
-Processing Timeout Test
-Simulate network delays or processing timeouts and ensure the system logs errors appropriately.
-Correlation ID Validation Test
-Ensure that every valid file upload generates a unique correlation ID for tracking the data flow.
+Test ID	Test Category	Test Case	Expected Outcome
+TC-01	File Upload Validation	Valid File Upload Test	File is uploaded successfully and appears in the Inbound folder.
+TC-02	File Upload Validation	Invalid File Extension Test	File is rejected, and processing does not start.
+TC-03	File Upload Validation	Empty File Upload Test	File is not processed, and an error log is generated.
+TC-04	File Upload Validation	Duplicate File Upload Test	System handles duplicates (overwrite, reject, or versioning).
+TC-05	Azure Storage Blob Validation	Blob Storage Creation Test	A corresponding Azure Storage Blob is created.
+TC-06	Azure Storage Blob Validation	Blob Metadata Validation Test	Metadata (filename, timestamp, eTag) is correct.
+TC-07	Azure Storage Blob Validation	Blob Storage Accessibility Test	Uploaded file is accessible and not corrupted.
+TC-08	Raw Table Validation	Raw Table Entry Creation Test	An entry for the file is created in the raw table.
+TC-09	Raw Table Validation	Raw Table Schema Validation Test	Raw table has the correct schema (columns, data types).
+TC-10	Raw Table Validation	Raw Table Data Integrity Test	Data in the raw table matches the uploaded file.
+TC-11	Transformation Validation	Transformation Job Execution Test	Transformation steps are triggered.
+TC-12	Transformation Validation	Transformation Data Accuracy Test	Data is transformed as per business logic.
+TC-13	Transformation Validation	Data Loss Prevention Test	No data is lost during transformation.
+TC-14	Final Table Validation	Final Table Creation Test	Final table is created successfully.
+TC-15	Final Table Validation	Final Table Schema Validation Test	Final table schema matches expectations.
+TC-16	Final Table Validation	Final Data Integrity Test	Transformed data is correctly stored in the final table.
+TC-17	File Processing & Movement	File Moved to Processing Directory Test	File moves from Inbound to processing directory.
+TC-18	File Processing & Movement	File Moved to Archive Directory Test	Processed files are correctly archived.
+TC-19	File Processing & Movement	File Deletion from Blob Storage Test	File is deleted from Blob Storage after processing.
+TC-20	Error Handling & Logging	Error Logging for Invalid File Test	Error logs are generated for invalid files.
+TC-21	Error Handling & Logging	Processing Timeout Test	System logs errors when processing timeouts occur.
+TC-22	Error Handling & Logging	Correlation ID Validation Test	Each file receives a unique correlation ID for tracking.
+TC-23	CI/CD Integration & Automation	Automated Test Execution Test	GitHub Actions trigger tests in CI/CD pipeline.
+TC-24	CI/CD Integration & Automation	Test Report Generation Test	Test reports are generated and logged.
