@@ -52,6 +52,20 @@ Raw Table Data Integrity Test
 
 Verify that the data ingested into the raw table matches the uploaded file.
 
+File Movement and Cleanup Tests
+
+File Moved to Current Directory Test
+
+Verify that after processing, the file is moved from Inbound to the current directory.
+
+File Moved to Archive Directory Test
+
+Ensure that processed files are archived correctly.
+
+File Deletion from Blob Storage Test
+
+Verify that the original file is deleted from Blob Storage after processing.
+
 Error Handling & Logging Tests
 
 Error Logging for Invalid File Test
