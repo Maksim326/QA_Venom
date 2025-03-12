@@ -2,161 +2,196 @@ DataPlatform QA Automation Framework
 
 Revision History
 
-Discuss	Teams Thin Slice Group Chat
-Status	Draft
-Authors	Maksim Akhmetshin
-Approval	
-Process References	Tech Spec | Infrastructure Engineering (infraeng.dev)
-The Heilmeier Catechism (darpa.mil)
+Date
 
+Update Description
 
+Author
 
+TBD
 
-Date	Update Description	Author
-	Re-writing 	
-	Initial Creation	Maksim Akhmetshin
+Re-writing
 
-Summary (1-2 paragraphs)
-What is the proposed solution to the summarized view of the problem and opportunity
+Maksim Akhmetshin
 
-Problem and/or Opportunity
-Overview
+TBD
 
-Additional Detail
+Initial Creation
+
+Maksim Akhmetshin
+
+Summary
+
+This proposal outlines the QA Automation Test Framework for Data Flow Testing in an Azure-based data pipeline. The framework ensures end-to-end validation of every pipeline step, automation of key tests, and integration with CI/CD pipelines using GitHub Actions. This enables a scalable, modular, and efficient validation process for data transformations.
+
+Problem and/or Opportunity Overview
+
+Data pipelines process large volumes of structured and semi-structured data. Ensuring the correct ingestion, transformation, and final storage of this data is crucial for data integrity and business insights.
+
+Currently, manual validation of data flow results in:
+
+Time-consuming & error-prone processes
+
+Lack of automation and repeatability
+
+No centralized testing repository
+
+A QA Automation Test Framework will streamline validation, ensuring data integrity and correctness in an automated, scalable manner.
 
 Proposed Solution/Design
+
 Architecture
-<what is the architecture diagram for the design?>
 
+The QA Automation Test Framework will integrate with the Azure-based pipeline and automate validation for the following steps:
 
+File ingestion & upload validation – Ensure correct files are received and moved to blob storage.
 
+Raw table creation verification – Validate ingestion into the raw table.
+
+Transformation validation – Ensure business logic and data transformations are correctly applied.
+
+Final table validation – Validate correct storage and accessibility of transformed data.
+
+Workflow Overview:
+
+Test files are pushed to Inbound Path.
+
+Azure Function processes the file and moves it to Blob Storage.
+
+Azure Event Hub generates a correlation ID for tracking.
+
+Automated tests are triggered:
+
+Azure Function Tests verify file movement.
+
+Raw Table Tests validate ingestion.
+
+Transformation Tests confirm data correctness.
+
+Final Table Tests validate storage.
+
+Test results are published and reports generated.
 
 Data Model
-<what is the data model for the design?>
+
+Test Files: Stored in Azure Blob Storage, containing ~100 rows per file for 100+ clients.
+
+Raw Table: Stores ingested raw data.
+
+Transformed Table: Stores data after business logic transformation.
+
+Final Table: Stores data ready for reporting & analytics.
+
 Interfaces
-<what are the interfaces for this solution? In addition to API specs, consider including examples of how a real client use case would use these interfaces to solve their problem>
-Additional Details
+
+Azure Function App (Python) listens to Event Hub and triggers tests.
+
+Pytest & Behave (BDD) used for test execution.
+
+Azure Databricks (Spark Jobs) for validation of large datasets.
+
+GitHub Actions for CI/CD automation.
+
+Implementation Steps
+
+1. Test File Management
+
+Test files stored in Azure Blob Storage or Git repository.
+
+Files uploaded to an inbound folder, triggering Event Hub processing.
+
+2. Test Execution & Validation
+
+Using correlation ID, framework validates data at each stage.
+
+Raw Table validation verifies ingestion.
+
+Transformation validation ensures business logic correctness.
+
+Final Table validation ensures accurate storage.
+
+3. CI/CD Integration
+
+GitHub Actions triggers tests during deployment.
+
+Test execution does not impact production.
+
+Pipeline continues execution even if tests fail.
+
+Framework Benefits
+
+1. Automated Execution
+
+GitHub Actions automates test execution and deployment, eliminating manual steps.
+
+2. Scalability
+
+New test cases can be added independently without modifying production code.
+
+3. Modularity
+
+All test logic is centralized in a dedicated QA Automation Test Framework repository.
+
+Azure Testing Orchestration Function triggers tests at appropriate stages.
 
 Additional Considerations
 
 Monitoring and Logging Plan
-<how will the solution log performance and what components need to be monitored and how will they be monitored>
-Availability Considerations
-<what is the availability of the individual components?  how does that impact the availability of the system?>
-Security Implications (response required for compliance purposes)
 
-System Architecture Implications (response required for compliance purposes)
+Azure Monitor & Log Analytics track test execution and failures.
+
+Event Hub correlation IDs provide traceability.
+
+Availability Considerations
+
+Azure Functions scale dynamically based on event volume.
+
+Databricks Clusters are provisioned only when tests are needed.
+
+Security Implications
+
+RBAC applied to restrict access to test data.
+
+Blob Storage versioning ensures auditability.
 
 Backup and Retention Considerations
-<what components need backed up and who will do that and how will that happen?  how does restores happen and what are the implications?  How long does data need to be retained? >
+
+Test results stored in Blob Storage for 30 days.
+
+Automated cleanup using Azure Functions.
 
 Alternatives Considered
-Alternative Option
+
+Alternative
+
+Pros
+
+Cons
+
+Manual Testing
+
+Simple, no infra required
+
+Time-consuming, error-prone, non-scalable
+
+Using Fabric QA Workspace
+
+Structured, supports Power BI
+
+Additional cost, maintenance overhead
 
 Appendix
+
 Resources
 
+Tech Spec | Infrastructure Engineering
+
+The Heilmeier Catechism
+
 Status States
-•	Draft
-•	Active
-•	Replaced By
 
+Draft
 
+Active
 
-
-
-
-
-
-
-
-Proposal: QA Automation Test Framework for Data Flow Testing
-Introduction.
-This proposal outlines the design and implementation of a QA Automation Test Framework for Data Flow Testing in an Azure-based pipeline. The framework will ensure that every step in the pipeline is validated, automated, and integrated with CI/CD 
- 
-
-Objective
-The primary objectives of the QA Automation Test Framework include:
-1.	Automate Testing for Key Pipeline Steps, including:
-•	File ingestion and upload validation
-•	Raw table creation verification
-•	Transformation step(s) validation
-•	Final table validation
-2.	Centralized Test Logic in a dedicated QA Automation Test Framework repository.
-3.	Ensure that tests run only during deployment and on schedule, not in production.
-4.	Leverage GitHub Actions to start Automation testing at the end of deployment.
-Data Pipeline Execution with Tests
-The following steps outline how the testing framework integrates with the data pipeline:
-1.	Test files are pushed to the Inbound path for execution.
-2.	Azure function receives the file, creates blob storage and moves it to blob storage.
-3.	Azure Event Hub generates a correlation ID, which is used to track the data flow.
-4.	Automated tests validate each step of data processing:
-•	Azure function tests ensure file reception and movement to blob storage.
-•	Raw table tests verify data ingestion.
-•	Transformation tests validate business logic applied to raw data.
-•	Final table tests ensure correct data storage and accessibility.
-5.	Test results are published, and reports are generated.
-Overview of the Framework
-The framework consists of the following components:
-1. QA Automation Test Framework
-•	A dedicated repository for all test logic.
-•	Contains test cases for each stage of the pipeline.
-•	Uses pytest for execution and assertion validation.
-2. Azure Testing Orchestration Functions
-•	Orchestrates the execution of tests for different pipeline steps.
-•	Ensures the correct test cases are triggered at each step.
-•	Reads event data and correlation IDs to track and validate the data flow for uploaded file(s).
-
-Tools
-•	Python for writing test scripts.
-•	Pytest for executing test cases and validating assertions.
-•	Azure Functions to trigger and execute tests.
-•	Event Hub for tracking correlation IDs across the pipeline.
-•	GitHub Actions for test execution as part of CI/CD.
-•	Scheduler for triggering tests during CI/CD pipeline execution. 
-
-
-Implementation Steps
-1.	Test File Management
-•	Test files will be stored in the test repository or a dedicated blob storage.
-•	These files will be uploaded to an inbound folder, and the Azure function will generate a correlation ID for tracking.
-2.	Test Execution & Validation
-•	Using the correlation ID and file path, the framework will validate data ingestion.
-•	Tests will verify raw table creation, transformation steps, and final table correctness.
-3.	CI/CD Integration
-•	Tests will be executed only during CI/CD runs using GitHub Actions.
-•	If a test fails, the pipeline execution will continue.
-
-Framework Benefits:
-1.	Automated Execution
-•	GitHub Actions automates test execution and deployment, eliminating manual intervention.
-2.	Scalability
-•	New test cases can be added independently without modifying production code.
-3.	Modularity
-•	All test logic is centralized in the QA Automation Test Framework repository, avoiding duplication across repositories. 
-
-Data Flow(simplified)
- 
- 
-
-
- 
- 
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+Replaced By
