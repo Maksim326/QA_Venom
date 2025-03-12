@@ -1,115 +1,65 @@
-Git Repository for Both Test Files and Automation Code
+This guide covers: ✅ QA Workspace – Do you need it? (Pros, Cons, Benefits)
+✅ Where to store test files (small files ~100 rows, 100 clients)
+✅ How to store QA Automation Test Code & Azure Testing Function App
+✅ Databricks Notebook Example (Raw Table & Transformation Validation)
+✅ Terraform Deployment (for Databricks & Event Hub)
+✅ Pipeline Execution Flowchart Alignment
 
-Since files are small, you can store them directly in the same Git repository as your test automation code.
-Organize files by client to maintain clarity.
-File Structure Example
+1️⃣ Do You Need a QA Workspace?
+A QA Workspace in Microsoft Fabric can be useful, but not mandatory if other services handle testing.
 
-├── test-automation/
-│   ├── scripts/
-│   │   ├── test_runner.py
-│   │   ├── utils.py
-│   ├── tests/
-│   │   ├── client_A/
-│   │   │   ├── test_data_1.csv
-│   │   │   ├── test_data_2.txt
-│   │   ├── client_B/
-│   │   │   ├── test_data_1.csv
-│   │   │   ├── test_data_2.txt
-│   ├── README.md
-│   ├── .gitignore
-Pros of This Approach
+Pros (Why You Might Need It)	Cons (Why You Might Not Need It)
+✅ Centralized workspace for storing test data & results	❌ Adds overhead if all tests are already handled via Databricks & Blob Storage
+✅ Fabric Lakehouse stores test results for analysis (Power BI)	❌ If all test results are stored in Blob Storage, SQL DB, or Log Analytics, Fabric is redundant
+✅ RBAC Control & Governance for test data	❌ Requires additional cost & maintenance
+✅ Supports Spark-based validation (Fabric Notebooks)	❌ Databricks is often a better Spark solution
+📌 Recommendation
+🔹 If you need structured reporting & governance → Use a Fabric QA Workspace
+🔹 If everything runs via Databricks & Blob Storage → Skip Fabric QA Workspace
 
-Version Control: Git will track changes, making it easy to roll back if needed.
-Easy Collaboration: Team members can access test files along with automation scripts.
-Simple Organization: Storing files under a structured directory ensures clarity.
-Alternative: Git LFS (Large File Storage)
+2️⃣ Where to Store Test Files?
+Since your test files (~100 rows, ~100 clients) will trigger pipeline execution (P1 in flowchart), you need a storage solution that supports event-based triggers.
 
-If files grow larger over time, Git LFS can help manage them without bloating the repository.
+Storage Option	Best For	Pros	Cons
+Azure Blob Storage (Recommended)	Storing test files to trigger the pipeline	✅ Scalable & Cost-Effective
+✅ Supports Event Grid & Event Hub
+✅ Automatic versioning & retention policies	❌ Needs Azure Function App to trigger test execution
+Git Repo (QA Automation Tests Repo)	Static test files that rarely change	✅ Version control (Git)
+✅ Easy to rollback test cases	❌ Git cannot trigger event-based pipelines
+Azure Data Lake Storage (ADLS)	Managing large test datasets	✅ Supports structured file access	❌ Overkill for small test files
+📌 Recommendation
+Store test files in 🟢 Azure Blob Storage (Event-Driven)
+Use Git for version-controlled test cases
+File Naming Convention:
+Each file prefixed with TF-{client_id}.csv
+Example: TF-ClientA.csv, TF-ClientB.csv
+3️⃣ How to Store QA Automation Test Code & Azure Testing Function App
+Since test execution includes multiple Spark Jobs (Raw Table Validation, Transformation Validation), you need a structured Git repository.
 
-
-Storage Option	Pros	Cons	Best Use Case
-Git (Version Control) – Store test files in the same repo as test automation code ✅ (Recommended Option)	- Simple setup, everything versioned together
-- Easy rollback and tracking changes
-- No extra tools required	- Repo may become large over time if files increase
-- Merge conflicts if multiple people edit the same file	Best for small test files that require frequent versioning and tracking.
-Git + LFS (Large File Storage)	- Keeps repo lightweight while versioning large files
-- Git history remains manageable	- Requires Git LFS setup
-- Some Git hosting providers limit LFS usage	If files start growing beyond small sizes (~100KB each).
-Cloud Storage (AWS S3, Azure Blob, Google Cloud Storage)	- Scalable, can handle more files over time
-- Access control and file versioning supported	- Requires cloud setup
-- Versioning is external to Git	Best for large-scale test data, especially if automation needs cloud storage.
-Database (PostgreSQL, MySQL) for Metadata + Cloud Storage for Files	- Structured query support for test data
-- Scalable and centralized	- More complex setup
-- Overhead for managing DB and storage separately	When test files need metadata indexing for advanced searches.
-Local File System (Organized Directories on a Shared Server)	- Simple and accessible
-- No need for external services	- No built-in versioning
-- Risk of accidental file deletion or overwrites	Suitable for quick access but not ideal for tracking changes.
-
-
-
-
-
-
-
-
-
-
-
-1. Git (Version Control)
-
-Official Git Documentation:
-
-Pro Git Book: https://git-scm.com/book/en/v2
-
-2. Git LFS (Large File Storage)
-
-Git LFS Official Site:
-
-GitHub Docs: About Git Large File Storage:
-
-3. Amazon S3 (Simple Storage Service)
-
-Amazon S3 Overview:
-
-Amazon S3 Documentation:
-
-4. Azure Blob Storage
-
-Azure Blob Storage Overview: https://docs.microsoft.com/en-us/azure/storage/blobs/storage-blobs-overview
-
-Azure Blob Storage Documentation: https://docs.microsoft.com/en-us/azure/storage/blobs/
-
-5. Google Cloud Storage
-
-Google Cloud Storage Overview: https://cloud.google.com/storage
-
-Google Cloud Storage Documentation: https://cloud.google.com/storage/docs
-
-6. PostgreSQL
-
-PostgreSQL Official Documentation: https://www.postgresql.org/docs/
-
-PostgreSQL Tutorial: https://www.postgresqltutorial.com/
-
-7. MySQL
-
-MySQL Official Documentation: https://dev.mysql.com/doc/
-
-MySQL Reference Manual: https://dev.mysql.com/doc/refman/8.0/en/
-
-8. Network File System (NFS)
-
-NFS Howto: https://tldp.org/HOWTO/NFS-HOWTO/
-
-ArchWiki: NFS: https://wiki.archlinux.org/title/NFS
-
-9. Samba (SMB)
-
-Samba Official Documentation: https://www.samba.org/samba/docs/
-
-ArchWiki: Samba: https://wiki.archlinux.org/title/Samba
-
-10. Local File System
-
-Linux Filesystem Hierarchy Standard: https://refspecs.linuxfoundation.org/FHS_3.0/fhs-3.0.pdf
-
+📌 Recommended Repo Structure
+bash
+Copy
+Edit
+qa-automation-repo/
+│── tests/                         # Automation test scripts
+│   ├── test_runner.py
+│   ├── integration_tests.py
+│   ├── unit_tests.py
+│── test_data/                      # Test files (if version-controlled)
+│   ├── TF-ClientA.csv
+│   ├── TF-ClientB.csv
+│── azure_function/                 # Azure Testing Orchestration Function
+│   ├── function_app.py
+│   ├── requirements.txt
+│   ├── host.json
+│   ├── __init__.py
+│── databricks_jobs/                 # Spark Jobs for Validation
+│   ├── raw_validation.py
+│   ├── transformation_validation.py
+│── .gitignore
+│── azure-pipelines.yml             # CI/CD for Function App + Databricks
+│── README.md
+📌 Key Takeaways
+✅ QA Automation Tests & Azure Function stay in the same repo
+✅ Blob Storage for test files (Git only for static test cases)
+✅ Databricks Jobs stored in Git (Synced to Databricks via CI/CD)
