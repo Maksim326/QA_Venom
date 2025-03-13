@@ -1,197 +1,90 @@
-DataPlatform QA Automation Framework
-
-Revision History
-
-Date
-
-Update Description
-
-Author
-
-TBD
-
-Re-writing
-
-Maksim Akhmetshin
-
-TBD
-
-Initial Creation
-
-Maksim Akhmetshin
-
-Summary
-
-This proposal outlines the QA Automation Test Framework for Data Flow Testing in an Azure-based data pipeline. The framework ensures end-to-end validation of every pipeline step, automation of key tests, and integration with CI/CD pipelines using GitHub Actions. This enables a scalable, modular, and efficient validation process for data transformations.
-
-Problem and/or Opportunity Overview
-
-Data pipelines process large volumes of structured and semi-structured data. Ensuring the correct ingestion, transformation, and final storage of this data is crucial for data integrity and business insights.
-
-Currently, manual validation of data flow results in:
-
-Time-consuming & error-prone processes
-
-Lack of automation and repeatability
-
-No centralized testing repository
-
-A QA Automation Test Framework will streamline validation, ensuring data integrity and correctness in an automated, scalable manner.
-
-Proposed Solution/Design
-
-Architecture
-
-The QA Automation Test Framework will integrate with the Azure-based pipeline and automate validation for the following steps:
-
-File ingestion & upload validation – Ensure correct files are received and moved to blob storage.
-
-Raw table creation verification – Validate ingestion into the raw table.
-
-Transformation validation – Ensure business logic and data transformations are correctly applied.
-
-Final table validation – Validate correct storage and accessibility of transformed data.
-
-Workflow Overview:
-
-Test files are pushed to Inbound Path.
-
-Azure Function processes the file and moves it to Blob Storage.
-
-Azure Event Hub generates a correlation ID for tracking.
-
-Automated tests are triggered:
-
-Azure Function Tests verify file movement.
-
-Raw Table Tests validate ingestion.
-
-Transformation Tests confirm data correctness.
-
-Final Table Tests validate storage.
-
-Test results are published and reports generated.
-
-Data Model
-
-Test Files: Stored in Azure Blob Storage, containing ~100 rows per file for 100+ clients.
-
-Raw Table: Stores ingested raw data.
-
-Transformed Table: Stores data after business logic transformation.
-
-Final Table: Stores data ready for reporting & analytics.
-
-Interfaces
-
-Azure Function App (Python) listens to Event Hub and triggers tests.
-
-Pytest & Behave (BDD) used for test execution.
-
-Azure Databricks (Spark Jobs) for validation of large datasets.
-
-GitHub Actions for CI/CD automation.
-
-Implementation Steps
-
-1. Test File Management
-
-Test files stored in Azure Blob Storage or Git repository.
-
-Files uploaded to an inbound folder, triggering Event Hub processing.
-
-2. Test Execution & Validation
-
-Using correlation ID, framework validates data at each stage.
-
-Raw Table validation verifies ingestion.
-
-Transformation validation ensures business logic correctness.
-
-Final Table validation ensures accurate storage.
-
-3. CI/CD Integration
-
-GitHub Actions triggers tests during deployment.
-
-Test execution does not impact production.
-
-Pipeline continues execution even if tests fail.
-
-Framework Benefits
-
-1. Automated Execution
-
-GitHub Actions automates test execution and deployment, eliminating manual steps.
-
-2. Scalability
-
-New test cases can be added independently without modifying production code.
-
-3. Modularity
-
-All test logic is centralized in a dedicated QA Automation Test Framework repository.
-
-Azure Testing Orchestration Function triggers tests at appropriate stages.
-
-Additional Considerations
-
-Monitoring and Logging Plan
-
-Azure Monitor & Log Analytics track test execution and failures.
-
-Event Hub correlation IDs provide traceability.
-
-Availability Considerations
-
-Azure Functions scale dynamically based on event volume.
-
-Databricks Clusters are provisioned only when tests are needed.
-
-Security Implications
-
-RBAC applied to restrict access to test data.
-
-Blob Storage versioning ensures auditability.
-
-Backup and Retention Considerations
-
-Test results stored in Blob Storage for 30 days.
-
-Automated cleanup using Azure Functions.
-
-Alternatives Considered
-
-Alternative
-
-Pros
-
-Cons
-
-Manual Testing
-
-Simple, no infra required
-
-Time-consuming, error-prone, non-scalable
-
-Using Fabric QA Workspace
-
-Structured, supports Power BI
-
-Additional cost, maintenance overhead
-
-Appendix
-
-Resources
-
-Tech Spec | Infrastructure Engineering
-
-The Heilmeier Catechism
-
-Status States
-
-Draft
-
-Active
-
-Replaced By
+Do We Need a QA Workspace?
+1.1 Test Execution Results
+Test execution results need a dedicated environment to store logs, test artifacts, and validation reports.
+Ensures isolation from Dev and Prod environments to prevent interference.
+Facilitates consistent debugging without affecting production data.
+1.2 Files Created from Pipeline with Test Execution
+Any files generated during test execution (e.g., intermediate datasets, transformed tables) should have a designated storage location.
+Helps in troubleshooting failed tests by keeping raw and transformed data available.
+Needs a cleanup strategy to prevent unnecessary storage costs.
+Benefits of Having a QA Workspace
+Pros	Details
+Supports Data Testing Spark Jobs	A separate QA workspace enables running Spark jobs without interfering with Dev/Prod workloads.
+Isolated from Dev Workspace	Prevents test execution from affecting Dev and Prod environments.
+Mimics Data Pipeline for QA	Provides a realistic testing environment that simulates production data transformations.
+Cons of Having a QA Workspace
+Cons	Details
+Additional Cost & Maintenance	A QA workspace requires additional resources, including compute, storage, and maintenance.
+Complexity in Managing Data Isolation	Requires defining clear access control policies to ensure QA data does not mix with Dev or Prod.
+Potential Duplication of Storage & Compute	If a separate QA workspace is used, duplicate data and Spark job runs could lead to inefficiencies.
+Key Considerations
+If Using CDE Offshore
+
+Need clarity on handling test result files and final pipeline execution files.
+Define a data retention & cleanup policy.
+Level of Isolation
+
+Should QA have its own workspace or use a shared Lakehouse?
+Define the level of separation between QA, Dev, and Prod.
+QA SJD
+
+Will QA have its own SJD (Security & Job Definition) or use Dev SJD?
+Logging Strategy
+
+QA logs should follow the same structure as Dev and Prod (but tagged as QA).
+Ensure traceability of tests using correlation IDs.
+Solution
+Best Practice: It is better to have a separate QA workspace to ensure proper isolation and prevent conflicts with Dev/Prod environments.
+Alternative: If a separate workspace is not feasible, use the Dev environment carefully with proper test data isolation.
+
+
+
+
+
+
+
+
+
+
+
+Where to Store Test Files Similar to Client Files?
+Each client test file contains approximately 100 rows and needs to be stored efficiently for test execution and validation. Below are two storage options:
+
+Option 1: Store in Git Repo with Test Code and Azure Testing Function
+✅ Pros
+Good for files that rarely change.
+Provides Version Control (track changes, rollback if needed).
+Easy to rollback test cases when updates are required.
+Fewer service dependencies, as files are stored alongside test scripts.
+❌ Cons
+Not suitable for frequently changing files.
+No event-driven execution (tests need to be manually triggered).
+Limited scalability for managing large datasets.
+📝 Notes
+Best for static or predefined test data.
+Works well when test cases are closely tied to automation code.
+Requires manual updates if test data needs to evolve with pipeline changes.
+Option 2: Store in Azure Blob Storage (In Pipeline)
+✅ Pros
+Enables automated test execution (files trigger pipeline events).
+Scalable (handles large datasets easily).
+Supports Event Hub (triggers Azure Functions when files are uploaded).
+Automatic versioning (keeps track of file history).
+Works seamlessly with Azure Function and CI/CD Pipelines.
+❌ Cons
+Requires Azure Function to process and trigger tests.
+Additional management overhead compared to Git storage.
+Access control considerations (ensure correct permissions).
+📝 Notes
+If using real client-like data, Azure Blob Storage is preferred.
+For simulated test cases, Git repo storage is sufficient.
+If test files evolve over time, Blob Storage provides better flexibility.
+Final Recommendation
+✔ If test files are static → Store them in Git repo with test code.
+✔ If test files need automation & event-driven execution → Store them in Azure Blob Storage.
+
+💡 Clarification Needed:
+
+Will test files be generated dynamically or will they be pre-created and updated manually?
+Do we need historical tracking of test files for debugging?
+Would you like a hybrid approach (Git for base files, Blob for real-time testing)? 🚀
