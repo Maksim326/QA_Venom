@@ -1,90 +1,37 @@
-Do We Need a QA Workspace?
-1.1 Test Execution Results
-Test execution results need a dedicated environment to store logs, test artifacts, and validation reports.
-Ensures isolation from Dev and Prod environments to prevent interference.
-Facilitates consistent debugging without affecting production data.
-1.2 Files Created from Pipeline with Test Execution
-Any files generated during test execution (e.g., intermediate datasets, transformed tables) should have a designated storage location.
-Helps in troubleshooting failed tests by keeping raw and transformed data available.
-Needs a cleanup strategy to prevent unnecessary storage costs.
-Benefits of Having a QA Workspace
-Pros	Details
-Supports Data Testing Spark Jobs	A separate QA workspace enables running Spark jobs without interfering with Dev/Prod workloads.
-Isolated from Dev Workspace	Prevents test execution from affecting Dev and Prod environments.
-Mimics Data Pipeline for QA	Provides a realistic testing environment that simulates production data transformations.
-Cons of Having a QA Workspace
-Cons	Details
-Additional Cost & Maintenance	A QA workspace requires additional resources, including compute, storage, and maintenance.
-Complexity in Managing Data Isolation	Requires defining clear access control policies to ensure QA data does not mix with Dev or Prod.
-Potential Duplication of Storage & Compute	If a separate QA workspace is used, duplicate data and Spark job runs could lead to inefficiencies.
-Key Considerations
-If Using CDE Offshore
-
-Need clarity on handling test result files and final pipeline execution files.
-Define a data retention & cleanup policy.
-Level of Isolation
-
-Should QA have its own workspace or use a shared Lakehouse?
-Define the level of separation between QA, Dev, and Prod.
-QA SJD
-
-Will QA have its own SJD (Security & Job Definition) or use Dev SJD?
-Logging Strategy
-
-QA logs should follow the same structure as Dev and Prod (but tagged as QA).
-Ensure traceability of tests using correlation IDs.
-Solution
-Best Practice: It is better to have a separate QA workspace to ensure proper isolation and prevent conflicts with Dev/Prod environments.
-Alternative: If a separate workspace is not feasible, use the Dev environment carefully with proper test data isolation.
-
-
-
-
-
-
-
-
-
-
-
-Where to Store Test Files Similar to Client Files?
-Each client test file contains approximately 100 rows and needs to be stored efficiently for test execution and validation. Below are two storage options:
-
-Option 1: Store in Git Repo with Test Code and Azure Testing Function
+Option 1: Reuse the Original QA Workspace for Regression Tests
 ✅ Pros
-Good for files that rarely change.
-Provides Version Control (track changes, rollback if needed).
-Easy to rollback test cases when updates are required.
-Fewer service dependencies, as files are stored alongside test scripts.
+
+Cost-Effective → No additional infrastructure or workspace setup required.
+Easier Maintenance → No need to manage multiple workspaces.
+Ensures Consistency → Regression tests run in the same environment as other tests.
 ❌ Cons
-Not suitable for frequently changing files.
-No event-driven execution (tests need to be manually triggered).
-Limited scalability for managing large datasets.
-📝 Notes
-Best for static or predefined test data.
-Works well when test cases are closely tied to automation code.
-Requires manual updates if test data needs to evolve with pipeline changes.
-Option 2: Store in Azure Blob Storage (In Pipeline)
+
+Resource Contention → Regression tests may interfere with ongoing QA testing.
+Parallel Execution Limitations → Long-running regression tests may slow down other test cycles.
+Environment Stability → Frequent test executions may make debugging difficult.
+📝 Best For:
+
+If test runs are scheduled and do not interfere with active testing.
+When test data and configurations remain the same for all test types.
+Option 2: Create a Separate QA Workspace for Regression Tests
 ✅ Pros
-Enables automated test execution (files trigger pipeline events).
-Scalable (handles large datasets easily).
-Supports Event Hub (triggers Azure Functions when files are uploaded).
-Automatic versioning (keeps track of file history).
-Works seamlessly with Azure Function and CI/CD Pipelines.
+
+Dedicated Resources → No impact on active QA testing.
+Parallel Test Execution → Faster test cycles by running regression tests independently.
+Isolated Test Data & Configurations → Avoids conflicts between regression and functional tests.
 ❌ Cons
-Requires Azure Function to process and trigger tests.
-Additional management overhead compared to Git storage.
-Access control considerations (ensure correct permissions).
-📝 Notes
-If using real client-like data, Azure Blob Storage is preferred.
-For simulated test cases, Git repo storage is sufficient.
-If test files evolve over time, Blob Storage provides better flexibility.
-Final Recommendation
-✔ If test files are static → Store them in Git repo with test code.
-✔ If test files need automation & event-driven execution → Store them in Azure Blob Storage.
 
-💡 Clarification Needed:
+Additional Cost → Maintaining multiple workspaces increases resource usage.
+More Management Overhead → Requires setting up, maintaining, and syncing test data across workspaces.
+Duplication of Data → Separate storage may be needed for test results and logs.
+📝 Best For:
 
-Will test files be generated dynamically or will they be pre-created and updated manually?
-Do we need historical tracking of test files for debugging?
-Would you like a hybrid approach (Git for base files, Blob for real-time testing)? 🚀
+When regression tests require a stable environment without frequent deployments.
+If tests are long-running and need isolated execution.
+When multiple teams are working on different test phases simultaneously.
+📌 Final Recommendation
+Scenario	Best Approach
+Regression tests run on the same schedule as other QA tests	✅ Reuse the original QA workspace
+Regression tests need to run frequently & independently	✅ Create a separate QA workspace
+Limited test resources & cost concerns	✅ Reuse the existing workspace
+Parallel execution of regression & functional tests needed	✅ Separate QA workspace recommended
