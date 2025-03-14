@@ -1,47 +1,5 @@
-Using Original QA Workspace for Regression Tests
-
-Why the Original QA Workspace Can Be Used
-
-The original QA workspace can be utilized for Regression Tests, eliminating the need for an additional workspace. This approach simplifies resource management and ensures consistency across all testing phases.
-
-Advantages of Reusing the Original QA Workspace
-
-Cost Efficiency – No additional infrastructure is required, reducing cloud expenses.
-
-Simplified Maintenance – Managing a single workspace is easier than maintaining multiple workspaces.
-
-Consistency in Testing – Ensures that regression tests are executed in the same environment as functional and integration tests, reducing discrepancies.
-
-Avoids Data Duplication – A single workspace prevents unnecessary duplication of test data and configurations.
-
-Comparison: One QA Workspace vs. Two QA Workspaces
-
-Aspect
-
-One QA Workspace (Recommended)
-
-Two QA Workspaces
-
-Resource Usage
-
-Efficient, no extra resources needed
-
-Additional storage & compute costs
-
-Management Complexity
-
-Easier to maintain
-
-Requires syncing test data & configurations
-
-Test Consistency
-
-Unified environment for all testing
-
-Risk of discrepancies between environments
-
-Parallel Execution
-
-Possible with scheduling strategies
-
-Requires dedicated compute for both workspaces
+Uploaded file successfully:
+ {'date': datetime.datetime(2025, 2, 12, 16, 48, 57, tzinfo=datetime.timezone.utc), 'etag': '"0x8DD4B8524E3ED2C"',
+ 'last_modified': datetime.datetime(2025, 2, 12, 16, 48, 57, tzinfo=datetime.timezone.utc), 'content_length': 0, 'client_request_id': '409c5412-e961-11ef-9d28-7c1e520cb576', 
+ 'request_id': 'ad608eff-601f-0012-4f6e-7db34f000000', 'version': '2025-01-05', 'request_server_encrypted': False, 'encryption_key_sha256': None, 'lease_renewed': None}
+ 
